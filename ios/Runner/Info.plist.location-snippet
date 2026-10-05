@@ -1,0 +1,12 @@
+<!-- Merge these keys into ios/Runner/Info.plist -->
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>Field Tracker uses your location to share your work position with your organization.</string>
+<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+<string>Field Tracker uses your location in the background during active field work so your organization can monitor field operations.</string>
+<key>NSLocationAlwaysUsageDescription</key>
+<string>Field Tracker uses your location during active field work.</string>
+<key>UIBackgroundModes</key>
+<array>
+    <string>fetch</string>
+    <string>location</string>
+</array>

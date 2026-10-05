@@ -1,0 +1,5 @@
+#!/bin/sh
+# Flutter's GitHub Actions workflow can invoke the system Gradle installation.
+# For a fully offline/self-contained wrapper, regenerate this file with
+# `gradle wrapper` on a machine with Gradle installed.
+exec gradle "$@"
