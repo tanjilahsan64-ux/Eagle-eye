@@ -1,0 +1,35 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function me() { return get(/databases/$(database)/documents/users/$(request.auth.uid)).data; }
+    function isMainAdmin() { return signedIn() && me().role == 'mainAdmin'; }
+    function isCoAdmin() { return signedIn() && me().role == 'coAdmin'; }
+    function isAdmin() { return isMainAdmin() || isCoAdmin(); }
+    function isAgent() { return signedIn() && me().role == 'fieldAgent'; }
+    function sameTeam(teamId) { return signedIn() && teamId in me().teamIds; }
+
+    match /users/{uid} {
+      allow read: if signedIn() && (uid == request.auth.uid || isAdmin());
+      allow create: if isMainAdmin();
+      allow update: if isMainAdmin() || (uid == request.auth.uid && isAgent());
+      allow delete: if isMainAdmin();
+      match /stops/{stopId} {
+        allow read: if isAdmin() || (uid == request.auth.uid && isAgent());
+        allow write: if uid == request.auth.uid && isAgent();
+      }
+    }
+
+    match /livePositions/{uid} {
+      allow read: if isAdmin() || (uid == request.auth.uid && isAgent()) ||
+        (isAgent() && sameTeam(resource.data.teamId));
+      allow create, update: if uid == request.auth.uid && isAgent();
+      allow delete: if isAdmin() || uid == request.auth.uid;
+    }
+
+    match /teams/{teamId} {
+      allow read: if isAdmin() || sameTeam(teamId);
+      allow write: if isMainAdmin();
+    }
+  }
+}
